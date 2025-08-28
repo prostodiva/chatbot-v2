@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["server.js", "src", "client"],
+  "out": "docs",
+  "excludeExternals": true,
+  "includeVersion": true
+}

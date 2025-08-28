@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "checkJs": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "server.js",
+    "src/**/*.{js,jsx}",
+    "client/**/*.{js,jsx}"
+  ]
+}
