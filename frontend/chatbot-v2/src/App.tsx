@@ -7,6 +7,8 @@ import {
 import HomePage from "./pages/HomePage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import {Provider} from "react-redux";
+import {store} from "./store";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +36,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+          <Provider store={store}>
+            <RouterProvider router={router} />;
+          </Provider>
+      );
 }
 
 export default App;

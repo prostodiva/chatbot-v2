@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 import Input from "../ux/Input.tsx";
 import Button from "../ux/Button.tsx";
 import { useNavigate } from "react-router-dom";
-import { useState} from "react";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector }  from "../../store/hooks/useAppDispatch.ts";
 import { MdOutlineAccountCircle } from 'react-icons/md';
+import { registerUser } from "../../store";
 
 const RegistrationForm = () => {
   const navigate = useNavigate();
@@ -13,13 +15,23 @@ const RegistrationForm = () => {
         password: '',
     });
     const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.user);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    navigate("/login");
-  };
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsLoading(true);
+      try {
+      await dispatch(registerUser(formData)).unwrap();
+        if (user) {
+          navigate("/login");
+        }
+      } catch (error) {
+      console.error('Registration failed:', error);
+    } finally {
+      setIsLoading(false);
+  }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -47,8 +59,12 @@ const RegistrationForm = () => {
         </label>
         <Input
             className="w-full px-4 py-3 border"
+            type="text"
+            name="name"
             onChange={handleChange}
-        value={formData.name}/>
+            value={formData.name}
+            required
+        />
 
           <label
               className="block text-sm font-medium text-gray-700">
@@ -56,8 +72,11 @@ const RegistrationForm = () => {
           </label>
           <Input
               className="w-full px-4 py-3 border"
+              type="text"
+              name="email"
               onChange={handleChange}
               value={formData.email}
+              required
           />
 
           <label className="block text-sm font-medium text-gray-700">
@@ -65,8 +84,11 @@ const RegistrationForm = () => {
           </label>
           <Input
               className="w-full px-4 py-3 border"
+              type="text"
+              name="password"
               onChange={handleChange}
-          value={formData.password}
+              value={formData.password}
+              required
           />
 
           <Button
