@@ -11,8 +11,8 @@ require("dotenv").config();
 const { connectRedis } = require('./config/redis');
 
 //import routes:
-// const authRoutes = require("./routes/auth");
-// const proxyRoutes = require("./routes/proxy");
+const authRoutes = require("./routes/auth");
+const proxyRoutes = require("./routes/proxy");
 
 const app = express();
 
@@ -26,6 +26,10 @@ app.use(cors());
 app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//routes
+app.use('/api/auth', authRoutes);
+app.use('/api', proxyRoutes); // Proxy all other API calls
 
 const PORT = process.env.PORT || 3000;
 
