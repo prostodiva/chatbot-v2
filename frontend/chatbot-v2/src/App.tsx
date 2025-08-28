@@ -9,6 +9,7 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import {Provider} from "react-redux";
 import {store} from "./store";
+import DashboardPage from "./pages/DashboardPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />
+      },
+      {
+        path: "/dashboard",
+        element: <DashboardPage />
       }
     ],
   },
