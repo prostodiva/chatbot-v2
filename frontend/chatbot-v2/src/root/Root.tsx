@@ -5,7 +5,7 @@
  * @returns {JSX.Element} The root layout component with header, content area, and footer
  * */
 
-import  Header from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 import { Outlet } from "react-router-dom";
@@ -13,9 +13,9 @@ import { Outlet } from "react-router-dom";
 function Root() {
   return (
     <div>
-        <Header />
-        <Outlet />
-        <Footer />
+      <Header />
+      <Outlet />
+      <Footer />
     </div>
   );
 }
