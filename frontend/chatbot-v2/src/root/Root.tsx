@@ -7,13 +7,16 @@
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useAppSelector} from "../store/hooks/useAppDispatch.ts";
 
 import { Outlet } from "react-router-dom";
 
 function Root() {
-  return (
+    const user = useAppSelector((state) => state.user.user);
+
+    return (
     <div>
-      <Header />
+      <Header userName={user?.name} />
       <Outlet />
       <Footer />
     </div>
