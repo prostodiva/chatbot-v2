@@ -36,3 +36,18 @@ export interface AuthResponse {
 
 
 
+
+//assistant types
+export interface Message {
+    id: string;
+    content: string;
+    sender: 'user' | 'assistant';
+    timestamp: string;
+}
+
+export interface AssistantState {
+    messages: Message[];
+    isLoading: boolean;
+    error: string | null;
+}
+

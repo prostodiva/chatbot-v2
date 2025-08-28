@@ -2,7 +2,10 @@ import Dashboard from "../components/Dashboard.tsx";
 
 function DashboardPage() {
     return (
-        <Dashboard />
+        <div>
+            <Dashboard />
+        </div>
+
     );
 }
 
