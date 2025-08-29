@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { PiSignOut } from 'react-icons/pi';
 import { GrRobot } from "react-icons/gr";
 import { logoutUser} from "../store";
+import {clearAllChatData} from "../store/slices/ChatSlice.ts";
 
 interface  HeaderProps {
   userName?: string;
@@ -14,6 +15,7 @@ function Header({ userName }: HeaderProps) {
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
+    dispatch(clearAllChatData());
     navigate('/login');
   };
 

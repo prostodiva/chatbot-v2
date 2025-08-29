@@ -57,6 +57,23 @@ class ChatService {
 
         return response.json();
     }
+
+    async fetchMessages(userToken: string, conversationId: string) {
+        const internalToken = await this.getInternalToken(userToken);
+
+        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${internalToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch messages');
+        }
+
+        return response.json();
+    }
 }
 
 export default new ChatService();

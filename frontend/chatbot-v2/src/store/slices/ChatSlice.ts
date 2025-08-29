@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { addChat } from "../thunks/addChat";
 import { sendMessage } from "../thunks/assistantThunks.ts";
 import { fetchCurrentChat } from "../thunks/fetchChats.ts";
+import { fetchMessages } from "../thunks/fetchMessages.ts";
 import type { ChatMessage, ChatState, Conversation } from "../types";
 
 const initialState: ChatState = {
@@ -18,12 +19,18 @@ const chatSlice = createSlice({
     name: 'chat',
     initialState,
     reducers: {
+        clearAllChatData: (state) => {
+            state.conversations = [];
+            state.currentConversation = null;
+            state.messages = [];
+            state.isLoading = false;
+            state.error = null;
+        },
         clearError: (state) => {
             state.error = null;
         },
         setCurrentConversation: (state, action: PayloadAction<Conversation>) => {
             state.currentConversation = action.payload;
-            state.messages = [];
         },
         clearCurrentConversation: (state) => {
             state.currentConversation = null;
@@ -59,7 +66,9 @@ const chatSlice = createSlice({
             })
             .addCase(sendMessage.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.messages.push(action.payload.userMessage, action.payload.assistantMessage);
+                if (state.currentConversation) {
+                    state.messages.push(action.payload.userMessage, action.payload.assistantMessage);
+                }
                 state.error = null;
             })
             .addCase(sendMessage.rejected, (state, action) => {
@@ -80,9 +89,23 @@ const chatSlice = createSlice({
             .addCase(addChat.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
+            })
+        //handle fetch messages separately for each chat
+        .addCase(fetchMessages.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchMessages.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.messages = action.payload;
+                state.error = null;
+            })
+            .addCase(fetchMessages.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
             });
     },
 });
 
-export const { clearError, setCurrentConversation, clearCurrentConversation, addMessage, addMessagePair } = chatSlice.actions;
+export const { clearAllChatData, clearError, setCurrentConversation, clearCurrentConversation, addMessage, addMessagePair } = chatSlice.actions;
 export default chatSlice.reducer;

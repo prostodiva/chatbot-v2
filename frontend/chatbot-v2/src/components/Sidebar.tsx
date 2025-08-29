@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { PiChatCircle, PiGear } from 'react-icons/pi';
 import type { RootState } from "../store";
 import { useAppDispatch, useAppSelector } from "../store/hooks/useAppDispatch.ts";
-import { setCurrentConversation } from "../store/slices/ChatSlice.ts";
+import { clearCurrentConversation, setCurrentConversation } from "../store/slices/ChatSlice.ts";
 import { addChat } from "../store/thunks/addChat";
 import { fetchCurrentChat } from "../store/thunks/fetchChats";
+import { fetchMessages } from "../store/thunks/fetchMessages.ts";
 import type { Conversation } from "../store/types.ts";
 
 function Sidebar() {
@@ -22,12 +23,14 @@ function Sidebar() {
         }
     };
 
-    const handleSelectChat = (conversation: Conversation) => {
+    const handleSelectChat = async (conversation: Conversation) => {
         dispatch(setCurrentConversation(conversation));
+        await dispatch(fetchMessages(conversation.id));
     };
 
     useEffect(() => {
         dispatch(fetchCurrentChat());
+        dispatch(clearCurrentConversation());
     }, [dispatch]);
 
     let content;

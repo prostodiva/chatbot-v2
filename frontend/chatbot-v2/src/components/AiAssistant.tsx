@@ -3,27 +3,27 @@ import { GrRobot } from 'react-icons/gr';
 import type { RootState } from "../store";
 import { useAppDispatch, useAppSelector } from "../store/hooks/useAppDispatch.ts";
 import { sendMessage } from "../store/thunks/assistantThunks";
-import type {ChatMessage} from '../store/types.ts';
 import Button from "./ux/Button.tsx";
 import Input from "./ux/Input.tsx";
 
 function AiAssistant() {
     const dispatch = useAppDispatch();
-    const { messages, isLoading } = useAppSelector((state: RootState)=> state.chat);
+    const { messages, isLoading, currentConversation } = useAppSelector((state: RootState)=> state.chat);
     const [inputValue, setInputValue] = useState('');
 
     const handleSendMessage = async () => {
         if (!inputValue.trim()) return;
 
-        const message: ChatMessage = {
-            id: Date.now().toString(),
-            content: inputValue,
-            sender: 'user',
-            timestamp: new Date().toISOString(),
-        };
+        if (!currentConversation) {
+            console.error('No current conversation selected');
+            return;
+        }
 
         try {
-            await dispatch(sendMessage(message.content)).unwrap();
+            await dispatch(sendMessage({
+                content: inputValue,
+                conversationId: currentConversation.id
+            })).unwrap();
             setInputValue('');
         } catch (error) {
             console.error('Failed to send message:', error);
@@ -34,6 +34,18 @@ function AiAssistant() {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
+        }
+    };
+
+    const formatTimestamp = (timestamp: string) => {
+        try {
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) {
+                return 'Invalid time';
+            }
+            return date.toLocaleTimeString();
+        } catch (error) {
+            return 'Invalid time';
         }
     };
 
@@ -83,7 +95,7 @@ function AiAssistant() {
                                     <p>{message.content}</p>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">
-                                    {new Date(message.timestamp).toLocaleTimeString()}
+                                    {formatTimestamp(message.timestamp)}
                                 </p>
                             </div>
                         </div>

@@ -175,4 +175,47 @@ router.get("/chats", authenticateInternal, async (req, res) => {
 });
 
 
+//routes to fetch specific conversation
+router.get("/conversations/:conversationId/messages", authenticateInternal, async (req, res) => {
+    try {
+        const pool = getPool();
+        const { conversationId } = req.params;
+        const userId = req.user?.id;
+
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+        // Verify the conversation belongs to the user
+        const convCheck = await pool.query(
+            'SELECT id FROM conversations WHERE id = $1 AND user_id = $2',
+            [conversationId, userId]
+        );
+
+        if (convCheck.rows.length === 0) {
+            return res.status(404).json({ error: "Conversation not found" });
+        }
+
+        // Fetch messages for the conversation
+        const result = await pool.query(
+            `SELECT id, role, content, created_at
+             FROM conversation_messages 
+             WHERE conversation_id = $1
+             ORDER BY created_at ASC`,
+            [conversationId]
+        );
+
+        // Format the messages properly
+        const formattedMessages = result.rows.map(row => ({
+            id: row.id,
+            content: row.content,
+            sender: row.role === 'user' ? 'user' : 'assistant',
+            timestamp: row.created_at
+        }));
+
+        res.json(formattedMessages);
+    } catch (error) {
+        console.error('Fetch messages error:', error);
+        res.status(500).json({ error: 'Failed to fetch messages' });
+    }
+});
+
 export default router;

@@ -6,6 +6,7 @@ import LoginForm from '../components/forms/LoginForm';
 import type { LoginCredentials } from "../store/types.ts";
 import { clearError } from '../store/slices/UserSlice.ts'
 import { loginUser} from "../store";
+import {clearAllChatData} from "../store/slices/ChatSlice.ts";
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ function LoginPage() {
         async (credentials: LoginCredentials) => {
             try {
                 dispatch(clearError());
+                dispatch(clearAllChatData());
                 const result = await dispatch(loginUser(credentials)).unwrap();
                 console.log('Login successful:', result);
                 navigate('/dashboard');
