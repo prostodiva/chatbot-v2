@@ -3,11 +3,11 @@ import type { Message } from "../types.ts";
 
 const sendMessage = createAsyncThunk<
     { userMessage: Message; assistantMessage: Message },
-    Message,
+    string,
     { rejectValue: string }
 >(
     "assistant/sendMessage",
-    async (userMessage, { rejectWithValue }) => {
+    async (content, { rejectWithValue }) => {
         try {
             const userToken = localStorage.getItem("authToken");
             if (!userToken) throw new Error("No authentication token found");
@@ -29,32 +29,42 @@ const sendMessage = createAsyncThunk<
 
             const { internalToken } = await internalTokenResponse.json();
 
-            const response = await fetch("http://localhost:3001/api/assistant/chat", {
+            const response = await fetch("http://localhost:3001/api/ai/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${internalToken}`,
                 },
                 body: JSON.stringify({
-                    message: userMessage.content,
-                    conversationId: null,
+                    message: {
+                        id: Date.now().toString(),
+                        content: content,
+                        sender: "user",
+                        timestamp: new Date().toISOString()
+                    },
+                    conversationId: 1
                 }),
             });
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error("Authentication required");
-                }
+                if (response.status === 401) throw new Error("Authentication required");
                 throw new Error("Failed to send message");
             }
 
             const data = await response.json();
 
-            const assistantMessage: Message = {
+            const userMessage: Message = {
                 id: Date.now().toString(),
+                content,
+                sender: "user",
+                timestamp: new Date().toISOString(),
+            };
+
+            const assistantMessage: Message = {
+                id: (Date.now() + 1).toString(),
                 content: data.message,
                 sender: "assistant",
-                timestamp: data.timestamp,
+                timestamp: data.timestamp ?? new Date().toISOString(),
             };
 
             return { userMessage, assistantMessage };
@@ -65,6 +75,5 @@ const sendMessage = createAsyncThunk<
         }
     }
 );
-
 
 export { sendMessage };

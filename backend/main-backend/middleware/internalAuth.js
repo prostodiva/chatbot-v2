@@ -1,5 +1,4 @@
-const jwt = require('jsonwebtoken');
-const pool = require('../config/database');
+import jwt from 'jsonwebtoken';
 
 const authenticateInternal = async (req, res, next) => {
     try {
@@ -26,6 +25,8 @@ const authenticateInternal = async (req, res, next) => {
                 return res.status(401).json({ error: 'Invalid internal token' });
             }
 
+            req.user = { id: decoded.userId };
+
             console.log('Token verification successful');
             next();
         } catch (jwtError) {
@@ -38,4 +39,4 @@ const authenticateInternal = async (req, res, next) => {
     }
 };
 
-module.exports = { authenticateInternal };
+export { authenticateInternal };

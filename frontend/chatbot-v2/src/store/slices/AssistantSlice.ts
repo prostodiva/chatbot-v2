@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type {AssistantState} from "../types.ts";
-import { sendMessage } from "../thunks/assistantThunks.ts";
+ import { sendMessage } from "../thunks/assistantThunks.ts";
 
 
 const initialState: AssistantState = {
