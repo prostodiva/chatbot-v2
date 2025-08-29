@@ -23,7 +23,7 @@ function AiAssistant() {
         };
 
         try {
-            await dispatch(sendMessage(message)).unwrap();
+            await dispatch(sendMessage(message.content)).unwrap();
             setInputValue('');
         } catch (error) {
             console.error('Failed to send message:', error);
