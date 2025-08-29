@@ -56,13 +56,40 @@ router.post("/chat", authenticateInternal, async (req, res) => {
         );
 
         const userMessage = userResult.rows[0];
-        const embedding = await generateEmbedding(messageContent); // Use messageContent here
+        const embedding = await generateEmbedding(messageContent);
+
+        // Ensure embedding is properly formatted as an array
+        let embeddingArray;
+        if (Array.isArray(embedding)) {
+            embeddingArray = embedding;
+        } else if (embedding && typeof embedding === 'object') {
+            // If it's an object, extract the values and ensure they're numbers
+            embeddingArray = Object.values(embedding).map(val => {
+                const num = parseFloat(val);
+                if (isNaN(num)) {
+                    throw new Error(`Invalid embedding value: ${val}`);
+                }
+                return num;
+            });
+        } else {
+            throw new Error(`Invalid embedding format: ${typeof embedding}`);
+        }
+
+        console.log('Embedding array type:', typeof embeddingArray);
+        console.log('Embedding array length:', embeddingArray.length);
+        console.log('First few values:', embeddingArray.slice(0, 5));
+        console.log('Is Array?', Array.isArray(embeddingArray));
+        console.log('First value type:', typeof embeddingArray[0]);
+
+        // Convert to PostgreSQL vector string format
+        const vectorString = '[' + embeddingArray.join(',') + ']';
+        console.log('Vector string format:', vectorString.substring(0, 100) + '...');
 
         // Store the embedding in document_embeddings table
         await pool.query(
             `INSERT INTO document_embeddings (document_id, content, embedding) 
              VALUES ($1, $2, $3::vector)`,
-            [userMessage.id.toString(), messageContent, embedding]
+            [userMessage.id.toString(), messageContent, vectorString]
         );
 
         const assistantReply = await getAiResponse(messageContent); // Use messageContent here
