@@ -19,7 +19,8 @@ CREATE TABLE conversations (
     query TEXT NOT NULL,
     response TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    rules TEXT  
+    rules TEXT,
+    name TEXT
 );
 
 CREATE TABLE conversation_messages (

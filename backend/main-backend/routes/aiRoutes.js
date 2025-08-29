@@ -302,6 +302,32 @@ router.put("/conversations/:conversationId/rules", authenticateInternal, async (
     }
 });
 
+//rename endpoint
+router.put("/conversations/:conversationId/rename", authenticateInternal, async (req, res) => {
+    try {
+        const pool = getPool();
+        const { conversationId } = req.params;
+        const { name } = req.body;
+        const userId = req.user?.id;
+
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+        const result = await pool.query(
+            'UPDATE conversations SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+            [name, conversationId, userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Conversation not found" });
+        }
+
+        res.json({ conversation: result.rows[0] });
+    } catch (error) {
+        console.error('Rename conversation error:', error);
+        res.status(500).json({ error: 'Failed to rename conversation' });
+    }
+});
+
 
 
 export default router;

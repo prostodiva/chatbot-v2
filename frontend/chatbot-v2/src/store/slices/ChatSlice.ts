@@ -5,6 +5,7 @@ import { sendMessage } from "../thunks/assistantThunks.ts";
 import { fetchCurrentChat } from "../thunks/fetchChats.ts";
 import { fetchMessages } from "../thunks/fetchMessages.ts";
 import { updateRules } from "../thunks/updateRules.ts";
+import { renameConversation } from "../thunks/renameConversation.ts";
 import type { ChatMessage, ChatState, Conversation } from "../types";
 
 const initialState: ChatState = {
@@ -135,6 +136,23 @@ const chatSlice = createSlice({
                 state.error = null;
             })
             .addCase(updateRules.rejected, (state, action) => {
+                state.error = action.payload as string;
+            })
+            .addCase(renameConversation.fulfilled, (state, action) => {
+                const { conversationId, name } = action.payload;
+
+                const conversation = state.conversations.find(c => c.id === conversationId);
+                if (conversation) {
+                    conversation.name = name;
+                }
+
+                if (state.currentConversation?.id === conversationId) {
+                    state.currentConversation.name = name;
+                }
+
+                state.error = null;
+            })
+            .addCase(renameConversation.rejected, (state, action) => {
                 state.error = action.payload as string;
             })
     },

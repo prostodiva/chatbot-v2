@@ -7,15 +7,30 @@ import { clearCurrentConversation, setCurrentConversation } from "../store/slice
 import { addChat } from "../store/thunks/addChat";
 import { fetchCurrentChat } from "../store/thunks/fetchChats";
 import { fetchMessages } from "../store/thunks/fetchMessages.ts";
+import { renameConversation } from "../store/thunks/renameConversation.ts";
 import { updateRules } from "../store/thunks/updateRules.ts";
 import type { Conversation } from "../store/types.ts";
+import Button from "./ux/Button.tsx";
+import Input from "./ux/Input.tsx";
 
 function Sidebar() {
     const dispatch = useAppDispatch();
     const { conversations, currentConversation, isLoading, error } = useAppSelector((state: RootState) => state.chat);
     const [rulesInput, setRulesInput] = useState('');
     const [editingRules, setEditingRules] = useState<string | null>(null);
+    const [editingName, setEditingName] = useState<string | null>(null);
+    const [nameInput, setNameInput] = useState('');
 
+    const handleRename = async (conversationId: string) => {
+        try {
+            await dispatch(renameConversation({ conversationId, name: nameInput })).unwrap();
+            setEditingName(null);
+            setNameInput('');
+        } catch (error) {
+            console.error('Failed to rename conversation:', error);
+        }
+    };
+    
     const handleUpdateRules = async (conversationId: string) => {
         try {
             await dispatch(updateRules({ conversationId, rules: rulesInput })).unwrap();
@@ -80,7 +95,7 @@ function Sidebar() {
             <div className="space-y-1">
                 {conversations.map((conversation) => (
                     <div key={conversation.id} className="space-y-2">
-                        <button
+                        <Button
                             onClick={() => handleSelectChat(conversation)}
                             className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
                                 currentConversation?.id === conversation.id
@@ -89,54 +104,97 @@ function Sidebar() {
                             }`}
                         >
                             <div className="truncate">
-                                {conversation.query || 'New conversation'}
+                                {conversation.name || conversation.query || 'New conversation'}
                             </div>
                             <div className="text-xs text-gray-500">
                                 {new Date(conversation.created_at).toLocaleDateString()}
                             </div>
                             {conversation.rules && conversation.rules.trim() !== '' ? (
-                                <div className="text-xs text-blue-600 mt-1 flex items-center">
-                                    Has rules
-                                </div>
+                                <div className="text-xs text-blue-600 mt-1">Has rules</div>
                             ) : (
-                                <div className="text-xs text-gray-500 mt-1 flex items-center">
-                                    No rules provided yet
-                                </div>
+                                <div className="text-xs text-gray-500 mt-1">No rules provided yet</div>
                             )}
+                        </Button>
 
-                    </button>
-
-                        {editingRules === conversation.id ? (
-                            <div className="px-3 pb-2">
-                    <textarea
-                        value={rulesInput}
-                        onChange={(e) => setRulesInput(e.target.value)}
-                        placeholder="Enter your rules for this conversation"
-                        className="w-full text-xs p-2 border rounded resize-none"
-                        rows={3}
-                    />
-                                <div className="flex space-x-2 mt-2">
-                                    <button
-                                        onClick={() => handleUpdateRules(conversation.id)}
-                                        className="text-xs px-2 py-1 bg-purple-800 text-white rounded hover:bg-purple-950"
+                        {editingName === conversation.id ? (
+                            <div className="px-3 py-2 bg-gray-50 rounded border">
+                                <div className="flex gap-2 items-center">
+                                    <Input
+                                        type="text"
+                                        value={nameInput}
+                                        onChange={(e) => setNameInput(e.target.value)}
+                                        placeholder="Enter new name"
+                                        className="px-2 py-1 border rounded text-sm"
+                                    />
+                                    <Button
+                                        onClick={() => handleRename(conversation.id)}
+                                        secondary
+                                        rounded
+                                        className="text-xs"
                                     >
                                         Save
-                                    </button>
-                                    <button
-                                        onClick={() => setEditingRules(null)}
-                                        className="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                    </Button>
+                                    <Button
+                                        onClick={() => setEditingName(null)}
+                                        secondary
+                                        rounded
+                                        className="text-xs"
                                     >
                                         Cancel
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         ) : (
-                            <button
+                            <Button
+                                onClick={() => {
+                                    setEditingName(conversation.id);
+                                    setNameInput(conversation.name || conversation.query);
+                                }}
+                                ternary
+                                rounded
+                                className="mx-3 text-xs"
+                            >
+                                ✏️ Rename
+                            </Button>
+                        )}
+
+                        {editingRules === conversation.id ? (
+                            <div className="px-3 py-2 bg-gray-50 rounded border">
+                                <textarea
+                                    value={rulesInput}
+                                    onChange={(e) => setRulesInput(e.target.value)}
+                                    placeholder="Enter your rules for this conversation"
+                                    className="w-full text-xs p-2 border rounded resize-none"
+                                    rows={3}
+                                />
+                                <div className="flex space-x-2 mt-2">
+                                    <Button
+                                        onClick={() => handleUpdateRules(conversation.id)}
+                                        secondary
+                                        rounded
+                                        className="text-xs"
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        onClick={() => setEditingRules(null)}
+                                        secondary
+                                        rounded
+                                        className="text-xs"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Button
                                 onClick={() => startEditingRules(conversation)}
-                                className="w-full text-xs text-gray-500 hover:text-gray-700 px-3 py-1"
+                                secondary
+                                rounded
+                                className="mx-3 text-xs"
                             >
                                 {conversation.rules ? 'Edit Rules' : 'Add Rules'}
-                            </button>
+                            </Button>
                         )}
                     </div>
                 ))}

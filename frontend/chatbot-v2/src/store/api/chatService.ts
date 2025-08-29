@@ -110,6 +110,25 @@ class ChatService {
 
         return response.json();
     }
+
+    async renameConversation(userToken: string, conversationId: string, name: string) {
+        const internalToken = await this.getInternalToken(userToken);
+
+        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/rename`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${internalToken}`
+            },
+            body: JSON.stringify({ name })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to rename conversation');
+        }
+
+        return response.json();
+    }
 }
 
 
