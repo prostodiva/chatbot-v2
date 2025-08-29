@@ -1,9 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import chatService from '../api/chatService';
-import type { ChatMessage } from '../types';
+import type { ChatMessage, Conversation } from '../types';
 
 const fetchMessages = createAsyncThunk<
-    ChatMessage[], // Return type
+    { messages: ChatMessage[], conversation: Conversation },// Return type
     string, // Payload type (conversationId)
     { rejectValue: string }
 >(
@@ -15,8 +15,12 @@ const fetchMessages = createAsyncThunk<
                 throw new Error('No authentication token found');
             }
 
-            const messages = await chatService.fetchMessages(userToken, conversationId);
-            return messages;
+            const [messages, conversation] = await Promise.all([
+                chatService.fetchMessages(userToken, conversationId),
+                chatService.fetchConversation(userToken, conversationId)
+            ]);
+
+            return { messages, conversation };
         } catch (error) {
             return rejectWithValue(
                 error instanceof Error ? error.message : 'Failed to fetch messages'

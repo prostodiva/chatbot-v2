@@ -4,6 +4,7 @@ import { addChat } from "../thunks/addChat";
 import { sendMessage } from "../thunks/assistantThunks.ts";
 import { fetchCurrentChat } from "../thunks/fetchChats.ts";
 import { fetchMessages } from "../thunks/fetchMessages.ts";
+import { updateRules } from "../thunks/updateRules.ts";
 import type { ChatMessage, ChatState, Conversation } from "../types";
 
 const initialState: ChatState = {
@@ -42,6 +43,15 @@ const chatSlice = createSlice({
         addMessagePair: (state, action: PayloadAction<{ userMessage: ChatMessage; assistantMessage: ChatMessage }>) => {
             state.messages.push(action.payload.userMessage, action.payload.assistantMessage);
         },
+        updateConversationRules: (state, action: PayloadAction<{ conversationId: string; rules: string}>) => {
+            const conversation = state.conversations.find(c => c.id === action.payload.conversationId);
+            if (conversation) {
+                conversation.rules = action.payload.rules;
+            }
+            if (state.currentConversation?.id === action.payload.conversationId) {
+                state.currentConversation.rules = action.payload.rules;
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -91,21 +101,44 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             })
         //handle fetch messages separately for each chat
-        .addCase(fetchMessages.pending, (state) => {
+            .addCase(fetchMessages.pending, (state, action) => {
                 state.isLoading = true;
                 state.error = null;
             })
             .addCase(fetchMessages.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.messages = action.payload;
+                state.messages = action.payload.messages;
+
+                if (state.currentConversation) {
+                    state.currentConversation = {
+                        ...state.currentConversation,
+                        ...action.payload.conversation
+                    };
+                }
                 state.error = null;
             })
             .addCase(fetchMessages.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
-            });
+            })
+            .addCase(updateRules.fulfilled, (state, action) => {
+                const { conversationId, rules } = action.payload;
+
+                const conversation = state.conversations.find(c => c.id === conversationId);
+                if (conversation) {
+                    conversation.rules = rules;
+                }
+
+                if (state.currentConversation?.id === conversationId) {
+                    state.currentConversation.rules = rules;
+                }
+                state.error = null;
+            })
+            .addCase(updateRules.rejected, (state, action) => {
+                state.error = action.payload as string;
+            })
     },
 });
 
-export const { clearAllChatData, clearError, setCurrentConversation, clearCurrentConversation, addMessage, addMessagePair } = chatSlice.actions;
+export const { clearAllChatData, clearError, setCurrentConversation, clearCurrentConversation, addMessage, addMessagePair, updateConversationRules } = chatSlice.actions;
 export default chatSlice.reducer;

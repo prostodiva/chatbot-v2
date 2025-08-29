@@ -74,6 +74,43 @@ class ChatService {
 
         return response.json();
     }
+
+    async updateRules(userToken: string, conversationId: string, rules: string) {
+        const internalToken = await this.getInternalToken(userToken);
+
+        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/rules`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${internalToken}`,
+            },
+            body: JSON.stringify({ rules })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update rules');
+        }
+
+        return response.json();
+    }
+
+    async fetchConversation(userToken: string, conversationId: string) {
+        const internalToken = await this.getInternalToken(userToken);
+
+        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${internalToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch conversation');
+        }
+
+        return response.json();
+    }
 }
+
 
 export default new ChatService();

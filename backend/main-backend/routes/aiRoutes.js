@@ -6,10 +6,11 @@ import { generateEmbedding } from "../services/embeddingService.js";
 
 const router = express.Router();
 
+
 router.post("/chat", authenticateInternal, async (req, res) => {
     try {
         const pool = getPool();
-        const { message, conversationId } = req.body;
+        const { message, conversationId, rules } = req.body;
         const userId = req.user?.id;
 
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
@@ -29,7 +30,7 @@ router.post("/chat", authenticateInternal, async (req, res) => {
                 'SELECT id FROM conversations WHERE id = $1',
                 [conversationId]
             );
-            
+
             if (convCheck.rows.length === 0) {
                 // Create new conversation
                 const convResult = await pool.query(
@@ -47,7 +48,14 @@ router.post("/chat", authenticateInternal, async (req, res) => {
             actualConversationId = convResult.rows[0].id;
         }
 
-        // Now insert the user message
+        // Fetch rules AFTER conversation is created/confirmed
+        const rulesResult = await pool.query(
+            'SELECT rules FROM conversations WHERE id = $1',
+            [actualConversationId]
+        );
+        const conversationRules = rulesResult.rows[0]?.rules;
+
+        //insert the user message
         const userResult = await pool.query(
             `INSERT INTO conversation_messages (conversation_id, role, content)
              VALUES ($1, $2, $3)
@@ -92,7 +100,15 @@ router.post("/chat", authenticateInternal, async (req, res) => {
             [userMessage.id.toString(), messageContent, vectorString]
         );
 
-        const assistantReply = await getAiResponse(messageContent); // Use messageContent here
+        // Include rules in AI prompt
+        let aiPrompt = messageContent;
+        if (conversationRules) {
+            aiPrompt = `Rules for this conversation: ${conversationRules}\n\nUser message: ${messageContent}`;
+            console.log('=== AI Prompt with Rules ===');
+            console.log('Enhanced prompt:', aiPrompt);
+        }
+
+        const assistantReply = await getAiResponse(aiPrompt);
 
         const assistantResult = await pool.query(
             `INSERT INTO conversation_messages (conversation_id, role, content)
@@ -119,6 +135,9 @@ router.post("/chat", authenticateInternal, async (req, res) => {
         res.status(500).json({ error: "Failed to process chat" });
     }
 });
+
+
+
 
 router.post("/chat/add", authenticateInternal, async (req, res) => {
     try {
@@ -175,7 +194,7 @@ router.get("/chats", authenticateInternal, async (req, res) => {
 });
 
 
-//routes to fetch specific conversation
+//routes to fetch specific conversation  (For displaying chat history)
 router.get("/conversations/:conversationId/messages", authenticateInternal, async (req, res) => {
     try {
         const pool = getPool();
@@ -217,5 +236,72 @@ router.get("/conversations/:conversationId/messages", authenticateInternal, asyn
         res.status(500).json({ error: 'Failed to fetch messages' });
     }
 });
+
+
+//conversation - For getting conversation metadata (including rules)
+// fetch a single conversation with rules
+router.get("/conversations/:conversationId", authenticateInternal, async (req, res) => {
+    try {
+        const pool = getPool();
+        const { conversationId } = req.params;
+        const userId = req.user?.id;
+
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+        // Verify the conversation belongs to the user
+        const convCheck = await pool.query(
+            'SELECT id FROM conversations WHERE id = $1 AND user_id = $2',
+            [conversationId, userId]
+        );
+
+        if (convCheck.rows.length === 0) {
+            return res.status(404).json({ error: "Conversation not found" });
+        }
+
+        // Fetch the conversation with rules
+        const result = await pool.query(
+            `SELECT id, user_id, query, response, created_at, rules
+             FROM conversations 
+             WHERE id = $1`,
+            [conversationId]
+        );
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Fetch conversation error:', error);
+        res.status(500).json({ error: 'Failed to fetch conversation' });
+    }
+});
+
+//update conversation rules
+router.put("/conversations/:conversationId/rules", authenticateInternal, async (req, res) => {
+    try {
+        const pool = getPool();
+        const { conversationId } = req.params;
+        const { rules } = req.body;
+        const userId = req.user?.id;
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+        const convCheck = await pool.query(
+            'SELECT id FROM conversations WHERE id = $1 AND user_id = $2',
+            [conversationId, userId]
+        );
+
+        if (convCheck.rows.length === 0) {
+            return res.status(404).json({ error: "Conversation not found" });
+        }
+
+        await pool.query(
+            'UPDATE conversations SET rules = $1 WHERE id = $2',
+            [rules, conversationId]
+        );
+
+        res.json({ message: 'Rules updated successfully' });
+    } catch (error) {
+        console.error('Update rules error:', error);
+        res.status(500).json({ error: 'Failed to update rules' });
+    }
+});
+
+
 
 export default router;

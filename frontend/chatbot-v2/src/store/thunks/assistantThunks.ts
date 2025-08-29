@@ -5,11 +5,11 @@ import type { ChatMessage } from "../types.ts";
 //handles sending individual messages to the AI
 const sendMessage = createAsyncThunk<
     { userMessage: ChatMessage; assistantMessage: ChatMessage },
-    { content: string, conversationId: string},
+    { content: string, conversationId: string; rules?: string},
     { rejectValue: string }
 >(
     "assistant/sendMessage",
-    async ({ content, conversationId }, { rejectWithValue }) => {
+    async ({ content, conversationId, rules }, { rejectWithValue }) => {
         try {
             const userToken = localStorage.getItem("authToken");
             if (!userToken) throw new Error("No authentication token found");
@@ -45,6 +45,7 @@ const sendMessage = createAsyncThunk<
                         timestamp: new Date().toISOString()
                     },
                     conversationId: conversationId,
+                    rules: rules
                 }),
             });
 

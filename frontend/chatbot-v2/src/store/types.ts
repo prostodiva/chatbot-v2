@@ -48,6 +48,7 @@ export interface Conversation {
     id: string;
     user_id: number;
     query: string;
+    rules?: string;
     created_at: string;
     updated_at: string;
 }
