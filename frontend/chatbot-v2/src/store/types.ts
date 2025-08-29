@@ -36,18 +36,28 @@ export interface AuthResponse {
 
 
 
-
 //assistant types
-export interface Message {
+export interface ChatMessage {
     id: string;
     content: string;
     sender: 'user' | 'assistant';
     timestamp: string;
 }
 
-export interface AssistantState {
-    messages: Message[];
+export interface Conversation {
+    id: string;
+    user_id: number;
+    query: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ChatState {
+    conversations: Conversation[];
+    currentConversation: Conversation | null;
+    messages: ChatMessage[];
     isLoading: boolean;
     error: string | null;
 }
+
 

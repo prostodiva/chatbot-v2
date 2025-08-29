@@ -1,8 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { Message } from "../types.ts";
+import type { ChatMessage } from "../types.ts";
 
+
+//handles sending individual messages to the AI
 const sendMessage = createAsyncThunk<
-    { userMessage: Message; assistantMessage: Message },
+    { userMessage: ChatMessage; assistantMessage: ChatMessage },
     string,
     { rejectValue: string }
 >(
@@ -29,7 +31,7 @@ const sendMessage = createAsyncThunk<
 
             const { internalToken } = await internalTokenResponse.json();
 
-            const response = await fetch("http://localhost:3001/api/ai/chat", {
+            const response = await fetch("http://localhost:3001/api/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -53,14 +55,14 @@ const sendMessage = createAsyncThunk<
 
             const data = await response.json();
 
-            const userMessage: Message = {
+            const userMessage: ChatMessage = {
                 id: Date.now().toString(),
                 content,
                 sender: "user",
                 timestamp: new Date().toISOString(),
             };
 
-            const assistantMessage: Message = {
+            const assistantMessage: ChatMessage = {
                 id: (Date.now() + 1).toString(),
                 content: data.message,
                 sender: "assistant",

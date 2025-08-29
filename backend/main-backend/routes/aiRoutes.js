@@ -120,4 +120,59 @@ router.post("/chat", authenticateInternal, async (req, res) => {
     }
 });
 
+router.post("/chat/add", authenticateInternal, async (req, res) => {
+    try {
+        const pool = getPool();
+        const { initialMessage } = req.body;
+        const userId = req.user?.id;
+
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+        // Create new conversation
+        const convResult = await pool.query(
+            'INSERT INTO conversations (user_id, query) VALUES ($1, $2) RETURNING *',
+            [userId, initialMessage || 'New conversation']
+        );
+
+        const newConversation = convResult.rows[0];
+        
+        res.status(201).json({
+            conversation: newConversation,
+            message: 'Chat created successfully'
+        });
+    } catch (error) {
+        console.error('Create chat error:', error);
+        res.status(500).json({ error: 'Failed to create chat' });
+    }
+});
+
+
+//chats
+router.get("/chats", authenticateInternal, async (req, res) => {
+    try {
+        const pool = getPool();
+        const userId = req.user?.id;
+
+        if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+        const result = await pool.query(
+            `SELECT c.*, 
+                    COUNT(cm.id) as message_count,
+                    MAX(cm.created_at) as last_message_at
+             FROM conversations c
+             LEFT JOIN conversation_messages cm ON c.id = cm.conversation_id
+             WHERE c.user_id = $1
+             GROUP BY c.id
+             ORDER BY c.created_at DESC`, // FIXED: was c.updated_at
+            [userId]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Fetch chats error:', error);
+        res.status(500).json({ error: 'Failed to fetch chats' });
+    }
+});
+
+
 export default router;

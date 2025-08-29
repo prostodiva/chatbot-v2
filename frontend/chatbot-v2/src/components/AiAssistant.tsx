@@ -1,21 +1,21 @@
-import { GrRobot } from 'react-icons/gr';
 import { useState } from "react";
-import Input from "./ux/Input.tsx";
-import Button from "./ux/Button.tsx";
-import {useAppSelector, useAppDispatch} from "../store/hooks/useAppDispatch.ts";
-import type { Message } from '../store/types.ts'
+import { GrRobot } from 'react-icons/gr';
+import type { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/hooks/useAppDispatch.ts";
 import { sendMessage } from "../store/thunks/assistantThunks";
-import type {RootState} from "../store";
+import type {ChatMessage} from '../store/types.ts';
+import Button from "./ux/Button.tsx";
+import Input from "./ux/Input.tsx";
 
 function AiAssistant() {
     const dispatch = useAppDispatch();
-    const { messages, isLoading } = useAppSelector((state: RootState)=> state.assistant);
+    const { messages, isLoading } = useAppSelector((state: RootState)=> state.chat);
     const [inputValue, setInputValue] = useState('');
 
     const handleSendMessage = async () => {
         if (!inputValue.trim()) return;
 
-        const message: Message = {
+        const message: ChatMessage = {
             id: Date.now().toString(),
             content: inputValue,
             sender: 'user',

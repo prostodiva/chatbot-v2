@@ -16,7 +16,7 @@ app.use(morgan('combined'));
 app.use(express.json());
 
 // Routes
-app.use('/api/ai', aiRoutes);
+app.use('/api', aiRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'AI Backend API' });
