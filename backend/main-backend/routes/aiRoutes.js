@@ -24,10 +24,12 @@ router.post("/chat", authenticateInternal, async (req, res) => {
 
         // Create conversation if it doesn't exist
         let actualConversationId = conversationId;
+        let conversationRules = null;
+
         if (conversationId) {
             // Check if conversation exists
             const convCheck = await pool.query(
-                'SELECT id FROM conversations WHERE id = $1',
+                'SELECT id, rules FROM conversations WHERE id = $1',
                 [conversationId]
             );
 
@@ -38,6 +40,10 @@ router.post("/chat", authenticateInternal, async (req, res) => {
                     [userId, messageContent]
                 );
                 actualConversationId = convResult.rows[0].id;
+            }  else {
+            //get conversation rules
+            conversationRules  = convCheck.rows[0].rules;
+            console.log('existing conversation rules:', conversationRules);
             }
         } else {
             // Create new conversation if none provided
@@ -48,12 +54,12 @@ router.post("/chat", authenticateInternal, async (req, res) => {
             actualConversationId = convResult.rows[0].id;
         }
 
-        // Fetch rules AFTER conversation is created/confirmed
-        const rulesResult = await pool.query(
-            'SELECT rules FROM conversations WHERE id = $1',
-            [actualConversationId]
-        );
-        const conversationRules = rulesResult.rows[0]?.rules;
+        // was used in previous version -  Fetch rules AFTER conversation is created/confirmed
+        // const rulesResult = await pool.query(
+        //     'SELECT rules FROM conversations WHERE id = $1',
+        //     [actualConversationId]
+        // );
+        // const conversationRules = rulesResult.rows[0]?.rules;
 
         //insert the user message
         const userResult = await pool.query(
@@ -64,24 +70,8 @@ router.post("/chat", authenticateInternal, async (req, res) => {
         );
 
         const userMessage = userResult.rows[0];
-        const embedding = await generateEmbedding(messageContent);
+        const embeddingArray = await generateEmbedding(messageContent);
 
-        // Ensure embedding is properly formatted as an array
-        let embeddingArray;
-        if (Array.isArray(embedding)) {
-            embeddingArray = embedding;
-        } else if (embedding && typeof embedding === 'object') {
-            // If it's an object, extract the values and ensure they're numbers
-            embeddingArray = Object.values(embedding).map(val => {
-                const num = parseFloat(val);
-                if (isNaN(num)) {
-                    throw new Error(`Invalid embedding value: ${val}`);
-                }
-                return num;
-            });
-        } else {
-            throw new Error(`Invalid embedding format: ${typeof embedding}`);
-        }
 
         console.log('Embedding array type:', typeof embeddingArray);
         console.log('Embedding array length:', embeddingArray.length);
@@ -89,9 +79,11 @@ router.post("/chat", authenticateInternal, async (req, res) => {
         console.log('Is Array?', Array.isArray(embeddingArray));
         console.log('First value type:', typeof embeddingArray[0]);
 
+
         // Convert to PostgreSQL vector string format
         const vectorString = '[' + embeddingArray.join(',') + ']';
         console.log('Vector string format:', vectorString.substring(0, 100) + '...');
+
 
         // Store the embedding in document_embeddings table
         await pool.query(
@@ -100,40 +92,41 @@ router.post("/chat", authenticateInternal, async (req, res) => {
             [userMessage.id.toString(), messageContent, vectorString]
         );
 
-        // Include rules in AI prompt
-        let aiPrompt = messageContent;
-        if (conversationRules) {
-            aiPrompt = `Rules for this conversation: ${conversationRules}\n\nUser message: ${messageContent}`;
-            console.log('=== AI Prompt with Rules ===');
-            console.log('Enhanced prompt:', aiPrompt);
-        }
 
-        const assistantReply = await getAiResponse(aiPrompt);
+        // Use the enhanced AI service with RAG
+        const assistantReply = await getAiResponse(
+            messageContent,
+            actualConversationId,
+            userId,
+            conversationRules
+        );
 
+        // Insert the assistant's response
         const assistantResult = await pool.query(
-            `INSERT INTO conversation_messages (conversation_id, role, content)
-             VALUES ($1, $2, $3)
-                 RETURNING *`,
+            `INSERT INTO conversation_messages (conversation_id, role, content) VALUES ($1, $2, $3) RETURNING *`,
             [actualConversationId, "assistant", assistantReply]
+        );
+
+        // Store the assistant message embedding too (for future RAG searches)
+        const assistantEmbeddingArray = await generateEmbedding(assistantReply);
+        const assistantVectorString = '[' + assistantEmbeddingArray.join(',') + ']';
+
+        await pool.query(
+            `INSERT INTO document_embeddings (document_id, content, embedding) VALUES ($1, $2, $3::vector)`,
+            [assistantResult.rows[0].id.toString(), assistantReply, assistantVectorString]
         );
 
         res.json({
             message: assistantReply,
-            timestamp: assistantResult.rows[0].created_at,
+            timestamp: new Date().toISOString(),
             conversationId: actualConversationId
         });
-    } catch (err) {
-        console.error("Chat API error:", err);
-        console.error("Error details:", {
-            message: err.message,
-            stack: err.stack,
-            code: err.code,
-            detail: err.detail,
-            hint: err.hint,
-            where: err.where
-        });
-        res.status(500).json({ error: "Failed to process chat" });
+
+    } catch (error) {
+        console.error('Chat API error:', error);
+        res.status(500).json({ error: error.message });
     }
+
 });
 
 

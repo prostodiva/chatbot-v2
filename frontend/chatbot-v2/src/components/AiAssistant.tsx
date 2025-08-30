@@ -22,7 +22,8 @@ function AiAssistant() {
         try {
             await dispatch(sendMessage({
                 content: inputValue,
-                conversationId: currentConversation.id
+                conversationId: currentConversation.id,
+                rules: currentConversation.rules
             })).unwrap();
             setInputValue('');
         } catch (error) {
