@@ -15,4 +15,4 @@
 //     })
 // })
 //
-// export const { useSendMessageMutation } = assistantApi
+// export const { useSendMessageMutation } = assista

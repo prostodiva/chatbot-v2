@@ -2,11 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import userReducer from "./slices/UserSlice.ts"
 import chatReducer from './slices/ChatSlice.ts';
+import calendarReducer from "./slices/CalendarSlice";
 
 export const store = configureStore({
     reducer: {
         user: userReducer,
         chat: chatReducer,
+        calendar: calendarReducer,
     },
 });
 
@@ -18,7 +20,8 @@ export * from './thunks/loginUser.ts';
 export * from './thunks/logoutUser.ts';
 export * from './thunks/assistantThunks.ts';
 export * from './thunks/fetchChats.ts';
-export * from "./thunks/addChat.ts"
+export * from "./thunks/addChat.ts";
+export * from "./thunks/calendarThunks.ts";
 
 
 export type RootState = ReturnType<typeof store.getState>;

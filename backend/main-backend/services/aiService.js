@@ -83,15 +83,4 @@ export async function getAiResponse(message, conversationId, userId, rules = nul
     }
 }
 
-//previous version
-// export async function getAiResponse(message, context = []) {
-//     const prompt = context.concat([message]).join("\n");
-//
-//     const response = await getClient().chat.completions.create({
-//         model: "gpt-3.5-turbo",
-//         messages: [{ role: "user", content: prompt }],
-//         temperature: 0.7,
-//     });
-//
-//     return response.choices[0].message?.content || "Sorry, I couldn't respond.";
-// }
+

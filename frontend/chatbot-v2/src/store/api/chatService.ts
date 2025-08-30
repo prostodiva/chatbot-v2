@@ -2,7 +2,7 @@ const AUTH_BASE_URL = 'http://localhost:3000/api';
 const API_BASE_URL = 'http://localhost:3001/api';
 
 class ChatService {
-    private async getInternalToken(userToken: string): Promise<string> {
+    public async getInternalToken(userToken: string): Promise<string> {
         const response = await fetch(`${AUTH_BASE_URL}/auth/internal-token`, {
             method: 'POST',
             headers: {

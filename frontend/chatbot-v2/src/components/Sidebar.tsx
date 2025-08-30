@@ -12,6 +12,7 @@ import { updateRules } from "../store/thunks/updateRules.ts";
 import type { Conversation } from "../store/types.ts";
 import Button from "./ux/Button.tsx";
 import Input from "./ux/Input.tsx";
+import Calendar from "./Calendar.tsx";
 
 function Sidebar() {
     const dispatch = useAppDispatch();
@@ -227,7 +228,9 @@ function Sidebar() {
                         className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors"
                     >
                         <PiGear className="h-5 w-5" />
-                        <span>Calendar</span>
+                        <span>
+                            <Calendar />
+                        </span>
                     </button>
                 </nav>
             </div>

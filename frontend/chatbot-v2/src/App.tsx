@@ -1,15 +1,15 @@
-import Root from "./root/Root.tsx";
+import { Provider } from "react-redux";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import HomePage from "./pages/HomePage.tsx";
-import RegisterPage from "./pages/RegisterPage.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
-import {Provider} from "react-redux";
-import {store} from "./store";
 import DashboardPage from "./pages/DashboardPage.tsx";
+import HomePage from "./pages/HomePage.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
+import RegisterPage from "./pages/RegisterPage.tsx";
+import Root from "./root/Root.tsx";
+import { store } from "./store";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <DashboardPage />
-      }
+      },
     ],
   },
 ]);
