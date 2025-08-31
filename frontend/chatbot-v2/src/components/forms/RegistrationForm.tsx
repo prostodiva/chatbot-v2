@@ -46,7 +46,7 @@ const RegistrationForm = () => {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Register</h2>
         <p className="text-gray-600">
-          Create new account or
+          Create new account or{' '}
           <Link to="/login" className="inline-block">
             sign in
           </Link>
@@ -97,7 +97,7 @@ const RegistrationForm = () => {
               type="submit"
               disabled={isLoading}
           >
-              <MdOutlineAccountCircle />
+              <MdOutlineAccountCircle className="mr-2 inline-flex" />
               {isLoading ? (
                       <div className="flex items-center justify-center">
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>

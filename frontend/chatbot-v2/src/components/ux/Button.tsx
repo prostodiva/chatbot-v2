@@ -30,7 +30,7 @@ const Button = memo(
     const buttonClasses = classNames(
       "text-center py-3 px-4 border",
       {
-        "bg-blue-600 text-white hover:bg-blue-700": primary,
+        "bg-purple-900 text-white hover:bg-purple-700": primary,
         "bg-gray-500 text-white hover:bg-gray-700": secondary,
           "bg-purple-400 text-white hover:bg-purple-900": ternary,
         "bg-transparent border-blue-600 text-blue-600 hover:bg-blue-50":

@@ -12,10 +12,12 @@ import { updateRules } from "../store/thunks/updateRules.ts";
 import type { Conversation } from "../store/types.ts";
 import Button from "./ux/Button.tsx";
 import Input from "./ux/Input.tsx";
+import Skeleton from "./Skeleton.tsx";
+import Calendar from "./Calendar.tsx";
 
 function Sidebar() {
     const dispatch = useAppDispatch();
-    const { conversations, currentConversation, isLoading, error } = useAppSelector((state: RootState) => state.chat);
+    const { conversations, currentConversation, isLoadingConversations, error } = useAppSelector((state: RootState) => state.chat);
     const [rulesInput, setRulesInput] = useState('');
     const [editingRules, setEditingRules] = useState<string | null>(null);
     const [editingName, setEditingName] = useState<string | null>(null);
@@ -72,11 +74,9 @@ function Sidebar() {
     }, [dispatch]);
 
     let content;
-    if (isLoading) {
+    if (isLoadingConversations) {
         content = (
-            <div className="text-sm text-gray-500 py-2">
-                Loading chats...
-            </div>
+            <Skeleton times={5} className="h-10 w-full" />
         );
     } else if (error) {
         content = (
@@ -118,7 +118,7 @@ function Sidebar() {
 
                         {editingName === conversation.id ? (
                             <div className="px-3 py-2 bg-gray-50 rounded border">
-                                <div className="flex gap-2 items-center inline-flex">
+                                <div className="gap-2 items-center inline-flex">
                                     <Input
                                         type="text"
                                         value={nameInput}
@@ -207,17 +207,20 @@ function Sidebar() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
                 <nav className="space-y-2">
-                    <button
+                     <span>
+                         <Calendar />
+                     </span>
+                    <Button
                         onClick={handleNewChat}
-                        disabled={isLoading}
-                        className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors disabled:opacity-50"
+                        disabled={isLoadingConversations}
+                        primary
+                        rounded
+                        className="mt-3"
                     >
-                        <PiChatCircle className="h-5 w-5" />
-                        <span>New Chat</span>
-                    </button>
-                    
+                        <PiChatCircle className="h-5 w-5 inline-flex mr-2" />
+                        <span>Add Chat</span>
+                    </Button>
                     {content}
-
                 </nav>
             </div>
         </div>

@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+console.log('DATABASE_URL value:', process.env.DATABASE_URL);
+
+
 console.log('=== Environment Variables Debug ===');
 console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET');
 console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'NOT SET');

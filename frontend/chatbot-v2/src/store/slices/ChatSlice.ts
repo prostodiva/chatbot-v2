@@ -13,6 +13,7 @@ const initialState: ChatState = {
     currentConversation: null,
     messages: [],
     isLoading: false,
+    isLoadingConversations: false,
     error: null,
 };
 
@@ -21,6 +22,12 @@ const chatSlice = createSlice({
     name: 'chat',
     initialState,
     reducers: {
+        setLoading: (state, action: PayloadAction<boolean>) => {
+            state.isLoading = action.payload;
+        },
+        setLoadingConversations: (state, action: PayloadAction<boolean>) => {
+            state.isLoadingConversations = action.payload;
+        },
         clearAllChatData: (state) => {
             state.conversations = [];
             state.currentConversation = null;
@@ -58,16 +65,16 @@ const chatSlice = createSlice({
         builder
             // Handle fetchChats
             .addCase(fetchCurrentChat.pending, (state) => {
-                state.isLoading = true;
+                state.isLoadingConversations = true;
                 state.error = null;
             })
             .addCase(fetchCurrentChat.fulfilled, (state, action) => {
-                state.isLoading = false;
+                state.isLoadingConversations = false;
                 state.conversations = action.payload;
                 state.error = null;
             })
             .addCase(fetchCurrentChat.rejected, (state, action) => {
-                state.isLoading = false;
+                state.isLoadingConversations = false;
                 state.error = action.payload as string;
             })
             // Handle sendMessage
@@ -158,5 +165,5 @@ const chatSlice = createSlice({
     },
 });
 
-export const { clearAllChatData, clearError, setCurrentConversation, clearCurrentConversation, addMessage, addMessagePair, updateConversationRules } = chatSlice.actions;
+export const { setLoading,setLoadingConversations, clearError, clearAllChatData, setCurrentConversation, clearCurrentConversation, addMessage, addMessagePair, updateConversationRules } = chatSlice.actions;
 export default chatSlice.reducer;

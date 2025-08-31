@@ -75,13 +75,13 @@ router.get("/callback", async (req, res) => {
         // Store tokens in database using service
         await storeUserCalendarTokens(userId, tokens);
 
-        // Redirect back to dashboard with success message
-        res.redirect('http://localhost:5173?calendar=connected&message=Your+Google+Calendar+has+been+connected!+You+can+now+ask+me+to+show+your+schedule+or+create+events.');
+        // Redirect to dashboard with success message instead of root
+        res.redirect('http://localhost:5173/dashboard?calendar=connected&message=Your+Google+Calendar+has+been+connected!+You+can+now+ask+me+to+show+your+schedule+or+create+events.');
         
     } catch (error) {
         console.error('Calendar callback error:', error);
-        // Redirect back to dashboard with error message
-        res.redirect('http://localhost:5173?calendar=error&message=Failed+to+connect+calendar.+Please+try+again.');
+        // Redirect to dashboard with error message
+        res.redirect('http://localhost:5173/dashboard?calendar=error&message=Failed+to+connect+calendar.+Please+try+again.');
     }
 });
 

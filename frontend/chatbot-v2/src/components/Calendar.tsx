@@ -22,14 +22,15 @@ const Calendar = () => {
                 // Clean up URL params
                 window.history.replaceState({}, document.title, window.location.pathname);
                 
-                // Optionally show a toast or notification
-                // You can add a toast library or simple alert here
+                // Show success message (you can add a toast notification here)
+                alert(message); // Replace with proper toast notification
                 
                 // Refresh connection status
                 checkConnectionStatus();
             } else if (calendarStatus === 'error') {
                 console.log('❌ Calendar connection failed:', message);
                 window.history.replaceState({}, document.title, window.location.pathname);
+                alert(message); // Replace with proper error notification
             }
         }
     };

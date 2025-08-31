@@ -79,7 +79,7 @@ function AiAssistant() {
                         <div key={message.id} className="flex items-start space-x-3">
                             <div className="flex-shrink-0">
                                 <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                                    message.sender === 'user' ? 'bg-gray-500' : 'bg-blue-600'
+                                    message.sender === 'user' ? 'bg-gray-500' : 'bg-purple-950'
                                 }`}>
                                     {message.sender === 'user' ? (
                                         <span className="text-white text-sm font-medium">U</span>
@@ -90,7 +90,7 @@ function AiAssistant() {
                             </div>
                             <div className="flex-1">
                                 <div className={`rounded-lg px-4 py-3 ${
-                                    message.sender === 'user' ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-900'
+                                    message.sender === 'user' ? 'bg-blue-100 text-purple-950' : 'bg-gray-100 text-gray-900'
                                 }`}>
                                     <p>{message.content}</p>
                                 </div>
@@ -104,7 +104,7 @@ function AiAssistant() {
                 {isLoading && (
                     <div className="flex items-start space-x-3">
                         <div className="flex-shrink-0">
-                            <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <div className="h-8 w-8 bg-purple-950 rounded-full flex items-center justify-center">
                                 <GrRobot className="h-5 w-5 text-white" />
                             </div>
                         </div>

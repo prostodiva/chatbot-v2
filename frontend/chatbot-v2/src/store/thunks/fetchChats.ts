@@ -16,6 +16,7 @@ const fetchCurrentChat = createAsyncThunk<
             }
 
             const chats = await chatService.fetchChats(userToken);
+
             return chats;
         } catch (error) {
             return rejectWithValue(
@@ -24,5 +25,6 @@ const fetchCurrentChat = createAsyncThunk<
         }
     }
 );
+
 
 export { fetchCurrentChat };
