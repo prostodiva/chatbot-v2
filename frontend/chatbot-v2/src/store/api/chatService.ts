@@ -1,28 +1,16 @@
-const AUTH_BASE_URL = 'http://localhost:3000/api';
-const API_BASE_URL = 'http://localhost:3001/api';
+
+import { tokenService } from "./tokenService.ts";
+import {API_CONFIG} from "./api.ts";
 
 class ChatService {
     public async getInternalToken(userToken: string): Promise<string> {
-        const response = await fetch(`${AUTH_BASE_URL}/auth/internal-token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userToken}`,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to get internal token');
-        }
-
-        const { internalToken } = await response.json();
-        return internalToken;
+        return await tokenService.getInternalToken(userToken);
     }
 
     async addChat(userToken: string, initialMessage?: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch(`${API_BASE_URL}/chat/add`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chat/add`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,7 +32,7 @@ class ChatService {
     async fetchChats(userToken: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch(`${API_BASE_URL}/chats`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chats`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${internalToken}`,
@@ -61,7 +49,7 @@ class ChatService {
     async fetchMessages(userToken: string, conversationId: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/messages`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${internalToken}`,
@@ -78,7 +66,7 @@ class ChatService {
     async updateRules(userToken: string, conversationId: string, rules: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/rules`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/rules`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -97,7 +85,7 @@ class ChatService {
     async fetchConversation(userToken: string, conversationId: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${internalToken}`,
@@ -114,7 +102,7 @@ class ChatService {
     async renameConversation(userToken: string, conversationId: string, name: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/rename`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/rename`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

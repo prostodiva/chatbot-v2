@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { ChatMessage } from "../types.ts";
-
+import {tokenService} from "../api/tokenService.ts";
+import { API_CONFIG} from "../api/api.ts";
 
 //handles sending individual messages to the AI
 const sendMessage = createAsyncThunk<
@@ -14,24 +15,9 @@ const sendMessage = createAsyncThunk<
             const userToken = localStorage.getItem("authToken");
             if (!userToken) throw new Error("No authentication token found");
 
-            const internalTokenResponse = await fetch(
-                "http://localhost:3000/api/auth/internal-token",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${userToken}`,
-                    },
-                }
-            );
+            const internalToken = await tokenService.getInternalToken(userToken);
 
-            if (!internalTokenResponse.ok) {
-                throw new Error("Failed to get internal token");
-            }
-
-            const { internalToken } = await internalTokenResponse.json();
-
-            const response = await fetch("http://localhost:3001/api/chat", {
+            const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chat`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

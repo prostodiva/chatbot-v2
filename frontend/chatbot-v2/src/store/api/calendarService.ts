@@ -1,4 +1,5 @@
 import chatService from './chatService';
+import {API_CONFIG} from "./api.ts";
 
 class CalendarService {
     private async getInternalToken(userToken: string): Promise<string> {
@@ -8,7 +9,7 @@ class CalendarService {
     async checkConnectionStatus(userToken: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch('http://localhost:3001/api/calendar/status', {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/calendar/status`, {
             headers: {
                 'Authorization': `Bearer ${internalToken}`
             }
@@ -24,7 +25,7 @@ class CalendarService {
     async createEvent(userToken: string, eventDetails: any) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch('http://localhost:3001/api/calendar/events', {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/calendar/events`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ class CalendarService {
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
 
-        const response = await fetch(`http://localhost:3001/api/calendar/events?${params}`, {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/calendar/events?${params}`, {
             headers: {
                 'Authorization': `Bearer ${internalToken}`
             }
@@ -63,7 +64,7 @@ class CalendarService {
     async connectCalendar(userToken: string) {
         const internalToken = await this.getInternalToken(userToken);
 
-        const response = await fetch('http://localhost:3001/api/calendar/auth', {
+        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/calendar/auth`, {
             headers: {
                 'Authorization': `Bearer ${internalToken}`
             }

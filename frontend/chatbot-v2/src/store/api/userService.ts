@@ -4,8 +4,7 @@ import type {
     RegisterCredentials,
     User,
 } from '../types.ts';
-
-const API_BASE_URL = 'http://localhost:3000/api';
+import {API_CONFIG} from "./api.ts";
 
 class UserService {
     private getAuthHeaders(): Record<string, string> {
@@ -17,7 +16,7 @@ class UserService {
     }
 
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        const response = await fetch(`${API_CONFIG.AUTH_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,7 +35,7 @@ class UserService {
     }
 
     async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        const response = await fetch(`${API_CONFIG.AUTH_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,7 +54,7 @@ class UserService {
     }
 
     async getCurrentUser(): Promise<User> {
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        const response = await fetch(`${API_CONFIG.AUTH_BASE_URL}/auth/me`, {
             headers: this.getAuthHeaders(),
         });
 
