@@ -1,6 +1,7 @@
 
 import Sidebar from '../components/Sidebar';
 import AiAssistant from "./AiAssistant.tsx";
+import Calendar from "./Calendar.tsx";
 
 function Dashboard() {
 
@@ -12,6 +13,12 @@ function Dashboard() {
 
                     <div className="lg:col-span-3 space-y-8">
                        <AiAssistant />
+                    </div>
+
+                    <div>
+                        <span>
+                            <Calendar />
+                        </span>
                     </div>
                 </div>
             </div>

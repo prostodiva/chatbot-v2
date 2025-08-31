@@ -2,11 +2,13 @@ import { google } from 'googleapis';
 import getPool from "../config/database.js";
 
 // Google OAuth configuration
-const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.BASE_URL || 'http://localhost:3001'}/api/calendar/callback`
-);
+function createOAuthClient() {
+    return new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        `${process.env.BASE_URL || 'http://localhost:3001'}/api/calendar/callback`
+    );
+}
 
 // Get user's calendar tokens from database
 export async function getUserCalendarTokens(userId) {
@@ -47,6 +49,8 @@ export async function refreshUserTokens(userId) {
     if (!tokens?.refresh_token) {
         throw new Error('No refresh token available');
     }
+
+    const oauth2Client = createOAuthClient();
 
     oauth2Client.setCredentials({
         refresh_token: tokens.refresh_token
@@ -90,6 +94,8 @@ export async function createCalendarEvent(userId, eventDetails) {
         if (!accessToken) {
             throw new Error('Failed to get valid access token');
         }
+
+        const oauth2Client = createOAuthClient();
 
         // Set credentials
         oauth2Client.setCredentials({
@@ -142,12 +148,23 @@ export async function createCalendarEvent(userId, eventDetails) {
 // Get user's calendar events
 export async function getUserCalendarEvents(userId, startDate, endDate) {
     try {
+        console.log('📅 getUserCalendarEvents debug:');
+        console.log('  User ID:', userId);
+        console.log('  Start Date:', startDate);
+        console.log('  End Date:', endDate);
+        console.log('  Start Date type:', typeof startDate);
+        console.log('  End Date type:', typeof endDate);
+
         // Get valid access token
         const accessToken = await getValidAccessToken(userId);
 
         if (!accessToken) {
             throw new Error('Failed to get valid access token');
         }
+
+        console.log('  Access token obtained successfully');
+
+        const oauth2Client = createOAuthClient();
 
         // Set credentials
         oauth2Client.setCredentials({
@@ -160,6 +177,9 @@ export async function getUserCalendarEvents(userId, startDate, endDate) {
         // Set time range
         const timeMin = startDate ? new Date(startDate).toISOString() : new Date().toISOString();
         const timeMax = endDate ? new Date(endDate).toISOString() : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+        console.log('  API timeMin:', timeMin);
+        console.log('  API timeMax:', timeMax);
 
         // Get events from Google Calendar
         const eventsResult = await calendar.events.list({

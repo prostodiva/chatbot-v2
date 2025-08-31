@@ -1,6 +1,6 @@
 import express from "express";
-import { authenticateInternal } from "../middleware/internalAuth.js";
 import { google } from 'googleapis';
+import { authenticateInternal } from "../middleware/internalAuth.js";
 import { storeUserCalendarTokens } from "../services/calendarService.js";
 
 const router = express.Router();

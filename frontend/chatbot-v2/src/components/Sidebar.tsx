@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PiChatCircle, PiGear } from 'react-icons/pi';
+import { PiChatCircle } from 'react-icons/pi';
 import type { RootState } from "../store";
 import chatService from "../store/api/chatService.ts";
 import { useAppDispatch, useAppSelector } from "../store/hooks/useAppDispatch.ts";
@@ -12,7 +12,6 @@ import { updateRules } from "../store/thunks/updateRules.ts";
 import type { Conversation } from "../store/types.ts";
 import Button from "./ux/Button.tsx";
 import Input from "./ux/Input.tsx";
-import Calendar from "./Calendar.tsx";
 
 function Sidebar() {
     const dispatch = useAppDispatch();
@@ -119,7 +118,7 @@ function Sidebar() {
 
                         {editingName === conversation.id ? (
                             <div className="px-3 py-2 bg-gray-50 rounded border">
-                                <div className="flex gap-2 items-center">
+                                <div className="flex gap-2 items-center inline-flex">
                                     <Input
                                         type="text"
                                         value={nameInput}
@@ -155,7 +154,7 @@ function Sidebar() {
                                 rounded
                                 className="mx-3 text-xs"
                             >
-                                ✏️ Rename
+                                Rename
                             </Button>
                         )}
 
@@ -203,10 +202,6 @@ function Sidebar() {
         );
     }
 
-    const handleAddRule = () => {
-        console.log('Add rule clicked');
-    };
-
     return (
         <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -222,16 +217,7 @@ function Sidebar() {
                     </button>
                     
                     {content}
-                    
-                    <button
-                        onClick={handleAddRule}
-                        className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors"
-                    >
-                        <PiGear className="h-5 w-5" />
-                        <span>
-                            <Calendar />
-                        </span>
-                    </button>
+
                 </nav>
             </div>
         </div>
