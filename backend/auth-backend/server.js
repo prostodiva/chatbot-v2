@@ -1,12 +1,9 @@
-/**
- *
- * */
 
 const express = require("express");
+require("dotenv").config();
 const morgan = require("morgan");
 const helmet = require("helmet");
 const cors = require("cors");
-require("dotenv").config();
 
 const { connectRedis } = require('./config/redis');
 

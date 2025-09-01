@@ -38,6 +38,13 @@ const userSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = true;
     },
+    //cleanup
+    clearUserData: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.error = null;
+      state.isLoading = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -80,19 +87,20 @@ const userSlice = createSlice({
         state.user = action.payload;
         state.isAuthenticated = true;
       })
-      .addCase(fetchCurrentUser.rejected, (state) => {
-        state.isLoading = false;
-        state.isAuthenticated = false;
-        state.user = null;
-      })
-      // Logout
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.user = null;
-        state.isAuthenticated = false;
-        state.error = null;
-      });
+        .addCase(logoutUser.fulfilled, (state) => {
+          state.user = null;
+          state.isAuthenticated = false;
+          state.error = null;
+          state.isLoading = false;
+        })
+        .addCase(logoutUser.rejected, (state) => {
+          state.user = null;
+          state.isAuthenticated = false;
+          state.error = null;
+          state.isLoading = false;
+        });
   },
 });
 
-export const { clearError, setUser } = userSlice.actions;
+export const { clearError, setUser, clearUserData} = userSlice.actions;
 export default userSlice.reducer;
