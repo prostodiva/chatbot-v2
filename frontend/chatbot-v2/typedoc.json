@@ -3,8 +3,12 @@
   "out": "docs",
   "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/node_modules/**"],
   "theme": "default",
-  "name": "AI Assistant",
+  "name": "AI Personal Assistant",
   "categoryOrder": ["Pages", "Components", "Store", "API", "Types", "Utilities"],
+  "readme": "README.md",
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
   "externalSymbolLinkMappings": {
     "react-router": {
       "useLoaderData": "https://reactrouter.com/en/main/hooks/use-loader-data",

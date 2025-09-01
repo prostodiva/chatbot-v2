@@ -31,7 +31,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <LoginPage />
+        element: <LoginPage />,
       },
       {
         path: "/dashboard",
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             <DashboardPage />
           </ProtectedRoute>
-        )
+        ),
       },
     ],
   },
@@ -47,10 +47,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-          <Provider store={store}>
-            <RouterProvider router={router} />;
-          </Provider>
-      );
+    <Provider store={store}>
+      <RouterProvider router={router} />;
+    </Provider>
+  );
 }
 
 export default App;

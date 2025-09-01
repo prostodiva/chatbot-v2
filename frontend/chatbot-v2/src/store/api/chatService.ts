@@ -1,123 +1,147 @@
-
 import { tokenService } from "./tokenService.ts";
-import {API_CONFIG} from "./api.ts";
+import { API_CONFIG } from "./api.ts";
 
+/**
+ * Service class for managing chat-related API operations
+ *
+ *  This service handles all communication with the chat backend:
+ * - Internal token management
+ * - Chat creation and management
+ * - Message retrieval and updates
+ * - Conversation rules management
+ * @author Margarita Kattsyna
+ */
 class ChatService {
-    public async getInternalToken(userToken: string): Promise<string> {
-        return await tokenService.getInternalToken(userToken);
+  public async getInternalToken(userToken: string): Promise<string> {
+    return await tokenService.getInternalToken(userToken);
+  }
+
+  async addChat(userToken: string, initialMessage?: string) {
+    const internalToken = await this.getInternalToken(userToken);
+
+    const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chat/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${internalToken}`,
+      },
+      body: JSON.stringify({
+        initialMessage: initialMessage || "New conversation started",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create new chat");
     }
 
-    async addChat(userToken: string, initialMessage?: string) {
-        const internalToken = await this.getInternalToken(userToken);
+    const data = await response.json();
+    return data;
+  }
 
-        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chat/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${internalToken}`,
-            },
-            body: JSON.stringify({
-                initialMessage: initialMessage || 'New conversation started'
-            }),
-        });
+  async fetchChats(userToken: string) {
+    const internalToken = await this.getInternalToken(userToken);
 
-        if (!response.ok) {
-            throw new Error('Failed to create new chat');
-        }
+    const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chats`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${internalToken}`,
+      },
+    });
 
-        const data = await response.json();
-        return data;
+    if (!response.ok) {
+      throw new Error("Failed to fetch chats");
     }
 
-    async fetchChats(userToken: string) {
-        const internalToken = await this.getInternalToken(userToken);
+    return response.json();
+  }
 
-        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/chats`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${internalToken}`,
-            },
-        });
+  async fetchMessages(userToken: string, conversationId: string) {
+    const internalToken = await this.getInternalToken(userToken);
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch chats');
-        }
+    const response = await fetch(
+      `${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/messages`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${internalToken}`,
+        },
+      },
+    );
 
-        return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to fetch messages");
     }
 
-    async fetchMessages(userToken: string, conversationId: string) {
-        const internalToken = await this.getInternalToken(userToken);
+    return response.json();
+  }
 
-        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/messages`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${internalToken}`,
-            },
-        });
+  async updateRules(userToken: string, conversationId: string, rules: string) {
+    const internalToken = await this.getInternalToken(userToken);
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch messages');
-        }
+    const response = await fetch(
+      `${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/rules`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${internalToken}`,
+        },
+        body: JSON.stringify({ rules }),
+      },
+    );
 
-        return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to update rules");
     }
 
-    async updateRules(userToken: string, conversationId: string, rules: string) {
-        const internalToken = await this.getInternalToken(userToken);
+    return response.json();
+  }
 
-        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/rules`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${internalToken}`,
-            },
-            body: JSON.stringify({ rules })
-        });
+  async fetchConversation(userToken: string, conversationId: string) {
+    const internalToken = await this.getInternalToken(userToken);
 
-        if (!response.ok) {
-            throw new Error('Failed to update rules');
-        }
+    const response = await fetch(
+      `${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${internalToken}`,
+        },
+      },
+    );
 
-        return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to fetch conversation");
     }
 
-    async fetchConversation(userToken: string, conversationId: string) {
-        const internalToken = await this.getInternalToken(userToken);
+    return response.json();
+  }
 
-        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${internalToken}`,
-            },
-        });
+  async renameConversation(
+    userToken: string,
+    conversationId: string,
+    name: string,
+  ) {
+    const internalToken = await this.getInternalToken(userToken);
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch conversation');
-        }
+    const response = await fetch(
+      `${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/rename`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${internalToken}`,
+        },
+        body: JSON.stringify({ name }),
+      },
+    );
 
-        return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to rename conversation");
     }
 
-    async renameConversation(userToken: string, conversationId: string, name: string) {
-        const internalToken = await this.getInternalToken(userToken);
-
-        const response = await fetch(`${API_CONFIG.MAIN_API_URL}/conversations/${conversationId}/rename`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${internalToken}`
-            },
-            body: JSON.stringify({ name })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to rename conversation');
-        }
-
-        return response.json();
-    }
+    return response.json();
+  }
 }
-
 
 export default new ChatService();

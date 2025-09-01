@@ -11,7 +11,7 @@ const RegisterPage = () => {
             <GrRobot className="h-20 w-20 text-white" />
           </Link>
         </div>
-          <RegistrationForm />
+        <RegistrationForm />
       </div>
     </div>
   );

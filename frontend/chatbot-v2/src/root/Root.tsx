@@ -6,13 +6,13 @@
  * */
 
 import Header from "../components/Header";
-import { useAppSelector} from "../store/hooks/useAppDispatch.ts";
+import { useAppSelector } from "../store/hooks/useAppDispatch.ts";
 import { Outlet } from "react-router-dom";
 
 function Root() {
-    const user = useAppSelector((state) => state.user.user)
+  const user = useAppSelector((state) => state.user.user);
 
-    return (
+  return (
     <div>
       <Header userName={user?.name} />
       <Outlet />

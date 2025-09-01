@@ -1,25 +1,34 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import  chatService from "../api/chatService";
+import chatService from "../api/chatService";
 
+/**
+ * Async thunk for renaming conversations
+ *
+ * Updates the display name of a conversation
+ *
+ * @author Margarita Kattsyna
+ */
 const renameConversation = createAsyncThunk<
-    { conversationId: string; name: string },
-    { conversationId: string; name: string },
-    { rejectValue: string }
+  { conversationId: string; name: string },
+  { conversationId: string; name: string },
+  { rejectValue: string }
 >(
-    'chat/renameConversation',
-    async ({ conversationId, name }, { rejectWithValue }) => {
-        try {
-            const userToken = localStorage.getItem("authToken");
-            if (!userToken) throw new Error("No authentication token found");
+  "chat/renameConversation",
+  async ({ conversationId, name }, { rejectWithValue }) => {
+    try {
+      const userToken = localStorage.getItem("authToken");
+      if (!userToken) throw new Error("No authentication token found");
 
-            await chatService.renameConversation(userToken, conversationId, name);
-            return { conversationId, name };
-        } catch (error) {
-            return rejectWithValue(
-                error instanceof Error ? error.message : 'Failed to rename conversation'
-            );
-        }
+      await chatService.renameConversation(userToken, conversationId, name);
+      return { conversationId, name };
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Failed to rename conversation",
+      );
     }
+  },
 );
 
 export { renameConversation };
