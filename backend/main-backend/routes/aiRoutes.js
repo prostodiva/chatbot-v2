@@ -17,7 +17,7 @@ router.post("/chat", authenticateInternal, async (req, res) => {
 
         // Extract the actual message content from the nested structure
         const messageContent = message.content?.content || message.content || message;
-        console.log('=== Debug: Message and Embedding ===');
+        console.log('Debug: Message and Embedding');
         console.log('Full message object:', message);
         console.log('Extracted content:', messageContent);
         console.log('Content type:', typeof messageContent);
@@ -53,13 +53,6 @@ router.post("/chat", authenticateInternal, async (req, res) => {
             );
             actualConversationId = convResult.rows[0].id;
         }
-
-        // was used in previous version -  Fetch rules AFTER conversation is created/confirmed
-        // const rulesResult = await pool.query(
-        //     'SELECT rules FROM conversations WHERE id = $1',
-        //     [actualConversationId]
-        // );
-        // const conversationRules = rulesResult.rows[0]?.rules;
 
         //insert the user message
         const userResult = await pool.query(
@@ -128,7 +121,6 @@ router.post("/chat", authenticateInternal, async (req, res) => {
     }
 
 });
-
 
 
 
@@ -229,7 +221,6 @@ router.get("/conversations/:conversationId/messages", authenticateInternal, asyn
         res.status(500).json({ error: 'Failed to fetch messages' });
     }
 });
-
 
 //conversation - For getting conversation metadata (including rules)
 // fetch a single conversation with rules

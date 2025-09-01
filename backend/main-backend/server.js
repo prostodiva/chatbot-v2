@@ -1,17 +1,46 @@
+/**
+ * Main Backend Server for AI Personal Assistant
+ *
+ * This is the core backend server that handles:
+ * - AI chat functionality and responses
+ * - Google Calendar integration
+ * - Vector search and embeddings
+ * - SMS notifications
+ * - Scheduled tasks and notifications
+ *
+ * ## Architecture Overview
+ * - **Express.js Server**: RESTful API with middleware
+ * - **Service Layer**: Business logic separated into service modules
+ * - **Route Layer**: API endpoints organized by functionality
+ * - **Database Integration**: PostgreSQL with vector search capabilities
+ * - **External APIs**: Google Calendar, OpenAI, Twilio SMS
+ *
+
+## Environment Variables Required
+* - `DATABASE_URL`: PostgreSQL connection string
+* - `GOOGLE_CLIENT_ID`: Google OAuth client ID
+* - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+* - `BASE_URL`: Application base URL
+* - `TWILIO_ACCOUNT_SID`: Twilio SMS account SID
+* - `TWILIO_AUTH_TOKEN`: Twilio SMS auth token
+* - `TWILIO_PHONE_NUMBER`: Twilio phone number for SMS
+                                                   * - `USER_PHONE_NUMBER`: User's phone number for notifications
+* - `PORT`: Server port (defaults to 3001)
+*
+* ## API Endpoints
+* - `/api` - AI chat and conversation endpoints
+* - `/api/calendar` - Google Calendar integration
+* - `/api/test` - Testing and health check endpoints
+*
+* @author Margarita Kattsyna
+* @see {@link ./routes/aiRoutes.js} - AI chat functionality
+* @see {@link ./routes/calendarRoutes.js} - Calendar integration
+* @see {@link ./services/aiService.js} - AI response generation
+* @see {@link ./services/calendarService.js} - Calendar operations
+*/
+
 import dotenv from 'dotenv';
 dotenv.config();
-
-console.log('DATABASE_URL value:', process.env.DATABASE_URL);
-
-
-console.log('=== Environment Variables Debug ===');
-console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET');
-console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'NOT SET');
-console.log('BASE_URL:', process.env.BASE_URL || 'NOT SET');
-console.log('TWILIO_ACCOUNT_SID:', process.env.TWILIO_ACCOUNT_SID ? 'SET' : 'NOT SET');
-console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN ? 'SET' : 'NOT SET');
-console.log('TWILIO_PHONE_NUMBER:', process.env.TWILIO_PHONE_NUMBER ? 'SET' : 'NOT SET');
-console.log('USER_PHONE_NUMBER:', process.env.USER_PHONE_NUMBER ? 'SET' : 'NOT SET');
 
 import cors from 'cors';
 import express from 'express';
@@ -22,11 +51,6 @@ import aiRoutes from './routes/aiRoutes.js';
 import calendarRoutes from "./routes/calendarRoutes.js";
 import testRoutes from './routes/testRoutes.js';
 import { startScheduleNotifications } from './services/schedulerService.js';
-
-console.log('=== Environment Variables Debug ===');
-console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'SET' : 'NOT SET');
-console.log('GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'SET' : 'NOT SET');
-console.log('BASE_URL:', process.env.BASE_URL || 'NOT SET');
 
 const app = express();
 

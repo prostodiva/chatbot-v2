@@ -1,8 +1,23 @@
+
 /**
- *  When a user asks "What did we talk about earlier?",
- *  it will search through all previous messages in that conversation
- *  and find the most similar ones to provide context to the AI.
- *  */
+ * Vector Search Service for RAG (Retrieval Augmented Generation)
+ *
+ * This service provides semantic search capabilities:
+ * - Generates embeddings for user queries
+ * - Searches conversation history using vector similarity
+ * - Provides context for AI responses
+ * - Implements cosine similarity search
+ *
+ * ## Features
+ * - **Semantic Search**: Find related content by meaning, not just keywords
+ * - **Vector Embeddings**: Uses OpenAI embeddings for semantic understanding
+ * - **Conversation Context**: Searches within specific conversation history
+ * - **Similarity Ranking**: Combines recency and semantic similarity
+ *
+ * @author Margarita Kattsyna
+ * @see {@link ./embeddingService.js} - OpenAI embedding generation
+ * @see {@link ../database/schema.sql} - Vector storage schema
+ */
 
 import getPool from "../config/database.js"
 import { generateEmbedding } from "./embeddingService.js";

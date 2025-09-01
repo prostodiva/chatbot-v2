@@ -1,3 +1,23 @@
+
+/**
+ * AI Service for handling chat interactions and responses
+ *
+ * This service manages:
+ * - OpenAI API integration for AI responses
+ * - Calendar intent detection and function calling
+ * - RAG (Retrieval Augmented Generation) for context-aware responses
+ * - Message processing and response generation
+ *
+ * ## Features
+ * - **Smart Intent Detection**: Automatically detects calendar-related requests
+ * - **Function Calling**: Integrates with Google Calendar functions
+ * - **Context Awareness**: Uses conversation history for better responses
+ * - **Rule-Based Responses**: Applies user-defined conversation rules
+ *
+ * @author Margarita Kattsyna
+ * @see {@link ./calendarFunctions.js} - Calendar function definitions
+ * @see {@link ./vectorSearchService.js} - Vector search for context
+ */
 import OpenAI from "openai";
 import { calendarFunctions, executeCalendarFunction } from "./calendarFunctions.js";
 import { findSimilarDocumentsInConversation } from "./vectorSearchService.js";

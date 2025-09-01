@@ -10,7 +10,7 @@ router.post('/test-sms', authenticateInternal, async (req, res) => {
         const userId = req.user.id;
         const phoneNumber = req.body.phoneNumber || process.env.USER_PHONE_NUMBER;
 
-        console.log('🧪 Testing SMS service...');
+        console.log(' Testing SMS service...');
         console.log('  User ID:', userId);
         console.log('  Phone Number:', phoneNumber);
 
@@ -23,7 +23,7 @@ router.post('/test-sms', authenticateInternal, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ SMS test failed:', error);
+        console.error('SMS test failed:', error);
         res.status(500).json({
             success: false,
             error: error.message

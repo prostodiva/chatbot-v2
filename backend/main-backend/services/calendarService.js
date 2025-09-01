@@ -1,3 +1,22 @@
+/**
+ * Calendar Service for Google Calendar integration
+ *
+ * This service handles all Google Calendar operations:
+ * - OAuth authentication and token management
+ * - Event creation, retrieval, and management
+ * - Calendar status checking
+ * - User calendar token storage
+ *
+ * ## Features
+ * - **OAuth Integration**: Secure Google Calendar authentication
+ * - **Event Management**: Create, read, update calendar events
+ * - **Token Management**: Secure storage and refresh of OAuth tokens
+ * - **Error Handling**: Comprehensive error handling and logging
+ *
+ * @author Margarita Kattsyna
+ * @see {@link ./calendarFunctions.js} - Calendar function definitions
+ * @see {@link ../database/schema.sql} - Database schema for calendar tokens
+ */
 import { google } from 'googleapis';
 import getPool from "../config/database.js";
 
